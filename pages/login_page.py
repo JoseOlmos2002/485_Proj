@@ -2,7 +2,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 class LoginPage(ttk.Frame):
-    def __init__(self, parent, show_page):
+    def __init__(self, parent, show_page, session):
         super().__init__(parent)
 
         # Make the parent frame expand and fill the window
@@ -19,29 +19,30 @@ class LoginPage(ttk.Frame):
         ttk.Label(form_frame, text="Login", font=("Helvetica", 16, "bold")).pack(pady=(0, 10))
 
         # Create the form contents inside form_frame
-        ttk.Label(form_frame, text="Email:").pack(anchor="w", padx=10, pady=(10, 0))
-        self.email_entry = ttk.Entry(form_frame, bootstyle="primary", width=25)
-        self.email_entry.pack(pady=(0, 10), padx=10)
+        ttk.Label(form_frame, text="Username:").pack(anchor="w", padx=10, pady=(10, 0))
+        self.username_entry = ttk.Entry(form_frame, bootstyle="primary", width=25)
+        self.username_entry.pack(pady=(0, 10), padx=10)
 
         ttk.Label(form_frame, text="Password:").pack(anchor="w", padx=10, pady=5)
         self.password_entry = ttk.Entry(form_frame, bootstyle="primary", width=25, show="*")  # Hide password text
         self.password_entry.pack(pady=(0, 10), padx=10)
 
         # Create the login button inside form_frame
-        ttk.Button(form_frame, text="Login", bootstyle=PRIMARY, command=lambda: self.login(show_page)).pack(pady=10)
+        ttk.Button(form_frame, text="Login", bootstyle=PRIMARY, command=lambda: self.login(show_page, session)).pack(pady=10)
         ttk.Button(form_frame, text="Sign Up", bootstyle=SECONDARY, command=lambda: show_page("SignupPage")).pack(pady=10)
 
-    def login(self, show_page):
+    def login(self, show_page, session):
         # Hardcoded credentials for login validation
-        correct_email = "user@example.com"
+        correct_username = "Spooks"
         correct_password = "password123"
         
         # Get user input
-        email = self.email_entry.get()
+        username = self.username_entry.get()
         password = self.password_entry.get()
 
         # Validate the credentials
-        if email == correct_email and password == correct_password:
+        if username == correct_username and password == correct_password:
+            session.set("username", username)
             show_page("LocationSelectionPage")  # Switch to the next page (MainPage)
         else:
             error_label = ttk.Label(self, text="Invalid email or password. Please try again.", bootstyle="danger")

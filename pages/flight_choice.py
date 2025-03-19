@@ -2,8 +2,10 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 class LocationSelectionPage(ttk.Frame):
-    def __init__(self, parent, show_page):
+    def __init__(self, parent, show_page, session):
         super().__init__(parent)
+
+        self.session = session
         
         # Sample locations for the choice boxes
         self.locations = ["New York", "Los Angeles", "Chicago", "Miami", "Dallas"]
@@ -11,6 +13,10 @@ class LocationSelectionPage(ttk.Frame):
         # Create a frame to hold all widgets
         self.container_frame = ttk.Frame(self)
         self.container_frame.pack(padx=20, pady=20, expand=True)
+
+        #Intro: show username
+        self.username_label = ttk.Label(self.container_frame, text=f"Username: {self.session.get('username', 'Guest')}")
+        self.username_label.pack(pady=10, padx=10)
 
         # Current Location
         ttk.Label(self.container_frame, text="Current Location:", font=("Helvetica", 12)).pack(pady=10)
@@ -48,3 +54,7 @@ class LocationSelectionPage(ttk.Frame):
         
         # Show result in label
         self.result_label.config(text=result)
+    
+    def update_username_display(self):
+        # This function can be called after updating the session email
+        self.username_label.config(text=f"Username: {self.session.get('username', 'Guest')}")

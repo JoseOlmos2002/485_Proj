@@ -4,6 +4,7 @@ from pages.main_page import MainPage
 from pages.login_page import LoginPage
 from pages.sign_up import SignupPage
 from pages.flight_choice import LocationSelectionPage
+from pages.session import Session
 
 class MultiPageApp(ttk.Window):
     def __init__(self):
@@ -15,6 +16,8 @@ class MultiPageApp(ttk.Window):
 
         self.geometry(f"{screen_width}x{screen_height}")
 
+        self.session = Session()
+
         self.pages = {}
         self.create_pages()
 
@@ -24,19 +27,20 @@ class MultiPageApp(ttk.Window):
     def create_pages(self):
         # Store pages in a dictionary
         self.pages["MainPage"] = MainPage(self, self.show_page)
-        self.pages["LoginPage"] = LoginPage(self, self.show_page)
-        self.pages["LocationSelectionPage"] = LocationSelectionPage(self, self.show_page)
+        self.pages["LoginPage"] = LoginPage(self, self.show_page, self.session)
+        self.pages["LocationSelectionPage"] = LocationSelectionPage(self, self.show_page, self.session)
         self.pages["SignupPage"] = SignupPage(self, self.show_page)
 
     def show_page(self, page_name):
-        # Hide all pages first
         for page in self.pages.values():
             page.pack_forget()
 
-        # Show the requested page
         self.pages[page_name].pack(fill="both", expand=True)
 
-        # Force a redraw of the window (using after to give Tkinter time to process)
+        # If the page is LocationSelectionPage and the email has changed, update it
+        if page_name == "LocationSelectionPage":
+            self.pages[page_name].update_username_display()
+
         self.after(50, self._force_redraw)
 
     def _force_redraw(self):
