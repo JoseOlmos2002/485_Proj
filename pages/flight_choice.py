@@ -6,7 +6,8 @@ class LocationSelectionPage(ttk.Frame):
         super().__init__(parent)
 
         self.session = session
-        
+        self.show_page = show_page
+
         # Sample locations for the choice boxes
         self.locations = ["New York", "Los Angeles", "Chicago", "Miami", "Dallas"]
 
@@ -14,7 +15,7 @@ class LocationSelectionPage(ttk.Frame):
         self.container_frame = ttk.Frame(self)
         self.container_frame.pack(padx=20, pady=20, expand=True)
 
-        #Intro: show username
+        # Intro: show username
         self.username_label = ttk.Label(self.container_frame, text=f"Username: {self.session.get('username', 'Guest')}")
         self.username_label.pack(pady=10, padx=10)
 
@@ -30,31 +31,22 @@ class LocationSelectionPage(ttk.Frame):
         self.destination_menu = ttk.Combobox(self.container_frame, textvariable=self.destination_var, values=self.locations, state="readonly", bootstyle="primary")
         self.destination_menu.pack(pady=5)
 
-        # Submit button
-        self.submit_button = ttk.Button(self.container_frame, text="Submit", bootstyle=SUCCESS, command=self.submit_data)
-        self.submit_button.pack(pady=20)
-
-        # Result label
-        self.result_label = ttk.Label(self.container_frame, text="", font=("Helvetica", 12))
-        self.result_label.pack(pady=10)
-
         # Navigation buttons
-        ttk.Button(self.container_frame, text="Next Page", bootstyle=PRIMARY, command=lambda: show_page("MainPage")).pack(pady=10)
+        ttk.Button(self.container_frame, text="Next Page", bootstyle=PRIMARY, command=self.submit_data).pack(pady=10)
 
     def submit_data(self):
         # Get selected current location and destination
         current_location = self.current_location_var.get()
         destination = self.destination_var.get()
 
-        # Update result label with the selected data
+        # Validate and store data
         if current_location and destination:
-            result = f"Current Location: {current_location}\nDestination: {destination}"
+            self.session.set('currentlocation', current_location)
+            self.session.set('destination', destination)
+            self.show_page("MainPage")  # Navigate to MainPage
         else:
-            result = "Please select both locations!"
-        
-        # Show result in label
-        self.result_label.config(text=result)
-    
+            ttk.Messagebox.show_warning("Input Error", "Please select both locations!")
+
     def update_username_display(self):
-        # This function can be called after updating the session email
+        # This function can be called after updating the session username
         self.username_label.config(text=f"Username: {self.session.get('username', 'Guest')}")

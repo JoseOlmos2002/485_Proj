@@ -3,8 +3,11 @@ from ttkbootstrap.constants import *
 from tkinter import messagebox
 
 class MainPage(ttk.Frame):
-    def __init__(self, parent, show_page):
+    def __init__(self, parent, show_page, session):
         super().__init__(parent)
+
+        self.session = session
+        self.show_page = show_page
 
         # Ensure the frame uses pack layout
         self.pack(fill="both", expand=True)
@@ -35,18 +38,39 @@ class MainPage(ttk.Frame):
         # Meal Choices
         meal_frame = ttk.Frame(self)
         meal_frame.pack(pady=10)
-        ttk.Label(meal_frame, text="Meal Choices:").pack(anchor="w", padx=10, pady=5)
+
+        # Meal Choices Label (larger font)
+        ttk.Label(meal_frame, text="Meal Choices:", font=("Helvetica", 14, "bold")).pack(anchor="w", padx=10, pady=5)
+
+        # Checkboxes with larger text
         self.meal_vars = {meal: ttk.IntVar() for meal in self.meals}
         for meal in self.meals:
-            ttk.Checkbutton(meal_frame, text=meal, variable=self.meal_vars[meal], bootstyle="success-round-toggle").pack(anchor="w", padx=10)
+            ttk.Checkbutton(
+                meal_frame, 
+                text=meal, 
+                variable=self.meal_vars[meal], 
+                bootstyle="success-round-toggle",
+                padding=(8, 2),  # Increase padding for easier interaction
+            ).pack(anchor="w", padx=10, pady=1)  # Add slight vertical padding
+
 
         # Beverage Choices
         beverage_frame = ttk.Frame(self)
         beverage_frame.pack(pady=10)
-        ttk.Label(beverage_frame, text="Beverage Choices:").pack(anchor="w", padx=10, pady=5)
+
+        # Beverage Choices Label (larger font)
+        ttk.Label(beverage_frame, text="Beverage Choices:", font=("Helvetica", 14, "bold")).pack(anchor="w", padx=10, pady=5)
+
+        # Checkboxes with larger text and better spacing
         self.beverage_vars = {beverage: ttk.IntVar() for beverage in self.beverages}
         for beverage in self.beverages:
-            ttk.Checkbutton(beverage_frame, text=beverage, variable=self.beverage_vars[beverage], bootstyle="info-round-toggle").pack(anchor="w", padx=10)
+            ttk.Checkbutton(
+                beverage_frame, 
+                text=beverage, 
+                variable=self.beverage_vars[beverage], 
+                bootstyle="info-round-toggle",
+                padding=(8, 2),  # Increase padding for easier interaction
+            ).pack(anchor="w", padx=10, pady=1)  # Add slight vertical padding
 
         # Submit and navigation buttons
         button_frame = ttk.Frame(self)
@@ -61,21 +85,20 @@ class MainPage(ttk.Frame):
         meal_choices = [meal for meal, var in self.meal_vars.items() if var.get()]
         beverage_choices = [bev for bev, var in self.beverage_vars.items() if var.get()]
 
+        
+
         if not name or not email:
             messagebox.showwarning("Input Error", "Please enter your name and email.")
             return
+        
+        
+        # Store user inputs in the session
+        self.session.set("name", name)
+        self.session.set("email", email)
+        self.session.set("seat_preference", seat)
+        self.session.set("meal_choices", meal_choices)
+        self.session.set("beverage_choices", beverage_choices)
 
-        reservation_details = f"""
-        Reservation Confirmation:
-        Name: {name}
-        Email: {email}
-        Seat Preference: {seat}
-        Meal Choices: {', '.join(meal_choices) if meal_choices else 'None'}
-        Beverage Choices: {', '.join(beverage_choices) if beverage_choices else 'None'}
-        """
-        messagebox.showinfo("Reservation Confirmed", reservation_details)
-
-    def clear_and_navigate(self, show_page, next_page):
         # Clear the text fields
         self.name_entry.delete(0, 'end')
         self.email_entry.delete(0, 'end')
@@ -88,4 +111,8 @@ class MainPage(ttk.Frame):
             beverage.set(0)  # Uncheck all beverage options
 
         # Navigate to the next page
-        show_page(next_page)
+        self.show_page("ConfirmationPage")
+
+
+
+ 
