@@ -63,4 +63,4 @@ class SignupPage(ttk.Frame):
         success_label.pack(pady=5)
 
         # Optionally, navigate to the next page after sign-up
-        show_page("LocationSelectionPage")  # Switch to another page after successful sign-up
+        # show_page("LocationSelectionPage")  # Switch to another page after successful sign-up
