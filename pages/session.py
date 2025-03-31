@@ -9,3 +9,6 @@ class Session:
     def get(self, key, default=None):
         """Retrieve a value from the session."""
         return self.data.get(key, default)
+    
+    def clear(self):
+        self.data.clear()

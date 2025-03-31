@@ -6,16 +6,24 @@ from pages.sign_up import SignupPage
 from pages.flight_choice import LocationSelectionPage
 from pages.session import Session
 from pages.confirmation import ConfirmationPage
+from pages.congratulations import Congratulations
+from pages.check_flight import CheckFlight
+from pages.flight_details import FlightDetailsPage
 
 class MultiPageApp(ttk.Window):
     def __init__(self):
         super().__init__(themename="litera")
         self.title("Flight Reservation")
 
-        screen_width = 1000
-        screen_height = 1000
+        screen_width = 850
+        screen_height = 800
 
         self.geometry(f"{screen_width}x{screen_height}")
+
+        self.maxsize(screen_width, screen_height)
+        
+        self.minsize(screen_width, screen_height)
+
 
         self.session = Session()
 
@@ -32,6 +40,9 @@ class MultiPageApp(ttk.Window):
         self.pages["LocationSelectionPage"] = LocationSelectionPage(self, self.show_page, self.session)
         self.pages["SignupPage"] = SignupPage(self, self.show_page)
         self.pages["ConfirmationPage"] = ConfirmationPage(self, self.show_page, self.session)
+        self.pages["Congratulations"] = Congratulations(self, self.show_page, self.session)
+        self.pages["CheckFlight"] = CheckFlight(self, self.show_page, self.session)
+        self.pages["FlightDetailsPage"] = FlightDetailsPage(self, self.show_page, self.session)
 
     def show_page(self, page_name):
         for page in self.pages.values():
@@ -39,19 +50,23 @@ class MultiPageApp(ttk.Window):
 
         self.pages[page_name].pack(fill="both", expand=True)
 
-        # If the page is LocationSelectionPage and the email has changed, update it
         if page_name == "LocationSelectionPage":
             self.pages[page_name].update_username_display()
 
         if page_name == "ConfirmationPage":
             self.pages[page_name].update_confirmation_display()
 
+        if page_name == "Congratulations":
+            self.pages[page_name].update_congratulations_display()
+        
+        if page_name == "FlightDetailsPage":
+            self.pages[page_name].update_flight_details()
+
         self.after(50, self._force_redraw)
 
     def _force_redraw(self):
-        # This ensures Tkinter processes the layout updates
-        self.update_idletasks()  # Processes pending layout tasks
-        self.update()  # Forces a redraw
+        self.update_idletasks() 
+        self.update()  
 
 if __name__ == "__main__":
     app = MultiPageApp()

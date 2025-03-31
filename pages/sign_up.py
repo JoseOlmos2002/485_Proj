@@ -1,12 +1,14 @@
+import re
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
+from . import db_connection as db
 
 class SignupPage(ttk.Frame):
     def __init__(self, parent, show_page):
         super().__init__(parent)
 
-        # Make the parent frame expand and fill the window
-        parent.pack_propagate(False)  # Prevent the parent from resizing with the frame
+        
+        parent.pack_propagate(False)  
         self.pack(fill="both", expand=True)
 
         # Create a frame for the signup form (this will be centered)
@@ -36,9 +38,21 @@ class SignupPage(ttk.Frame):
         self.confirm_password_entry.pack(pady=(0, 10), padx=10)
 
         # Create the sign-up button inside form_frame
-        ttk.Button(form_frame, text="Sign Up", bootstyle=PRIMARY, command=lambda: self.signup(show_page)).pack(pady=10)
-        ttk.Button(form_frame, text="Return to Login", bootstyle=PRIMARY, command=lambda: show_page("LoginPage")).pack(pady=10)
- 
+        ttk.Button(form_frame, text="Sign Up", bootstyle="outline-primary", command=lambda: self.signup(show_page)).pack(pady=10)
+        ttk.Button(form_frame, text="Return to Login", bootstyle="outline-secondary", command=lambda: show_page("LoginPage")).pack(pady=10)
+
+    def is_valid_email(self, email):
+        """Checks if the email is in a valid format."""
+        pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        return re.match(pattern, email)
+    
+    def clear_fields(self):
+        """Clears all input fields after signup."""
+        self.email_entry.delete(0, "end")
+        self.username_entry.delete(0, "end")
+        self.password_entry.delete(0, "end")
+        self.confirm_password_entry.delete(0, "end")
+
     def signup(self, show_page):
         # Get user input
         email = self.email_entry.get()
@@ -48,19 +62,25 @@ class SignupPage(ttk.Frame):
 
         # Basic validation
         if not email or not username or not password or not confirm_password:
-            error_label = ttk.Label(self, text="All fields are required. Please fill in all details.", bootstyle="danger")
-            error_label.pack(pady=5)
+            ttk.Label(self, text="All fields are required. Please fill in all details.", bootstyle="danger").pack(pady=5)
+            return
+
+        if not self.is_valid_email(email):
+            ttk.Label(self, text="Invalid email format. Please enter a valid email.", bootstyle="danger").pack(pady=5)
             return
 
         if password != confirm_password:
-            error_label = ttk.Label(self, text="Passwords do not match. Please try again.", bootstyle="danger")
-            error_label.pack(pady=5)
+            ttk.Label(self, text="Passwords do not match. Please try again.", bootstyle="danger").pack(pady=5)
             return
 
-        # If everything is valid, proceed (you can add more logic to save the user data, etc.)
-        success_message = f"Sign Up Successful!\nEmail: {email}\nUsername: {username}"
-        success_label = ttk.Label(self, text=success_message, bootstyle="success")
-        success_label.pack(pady=5)
+        # Save user to database
+        result = db.save_user(email, username, password)
+        if "Error" in result:
+            ttk.Label(self, text=result, bootstyle="danger").pack(pady=5)
+        else:
+            success_message = f"Sign Up Successful!\nEmail: {email}\nUsername: {username}. \n Please return to Login Page."
+            ttk.Label(self, text=success_message, bootstyle="success").pack(pady=5)
+            self.clear_fields()  # Clear form fields after successful signup
 
-        # Optionally, navigate to the next page after sign-up
-        # show_page("LocationSelectionPage")  # Switch to another page after successful sign-up
+
+
